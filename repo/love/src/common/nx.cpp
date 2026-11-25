@@ -4,6 +4,8 @@
 
 #include <unistd.h>
 #include <sys/stat.h>
+#include <cstdio>
+#include <cstring>
 
 extern char** __system_argv;
 static char g_cwd[FS_MAX_PATH] = {0};
@@ -17,10 +19,37 @@ extern "C" {
 
 	void userAppInit(void)
 	{
+#ifdef __SWITCH2__
+		// hbmenu may hand us a different cwd. Keep game.love and the save
+		// identity anchored to the NRO directory, including on chainloads.
+		if (__system_argv && __system_argv[0]) {
+			char path[FS_MAX_PATH];
+			int n = snprintf(path, sizeof(path), "%s", __system_argv[0]);
+			if (n > 0 && n < (int) sizeof(path)) {
+				char *slash = strrchr(path, '/');
+				if (slash) { *slash = 0; chdir(path); }
+			}
+		}
+		FILE *log = fopen("switch2-runtime.log", "w");
+		if (log) {
+			dup2(fileno(log), STDOUT_FILENO);
+			dup2(fileno(log), STDERR_FILENO);
+			fclose(log);
+			setvbuf(stdout, nullptr, _IONBF, 0);
+			setvbuf(stderr, nullptr, _IONBF, 0);
+		}
+		printf("Gen1Recomp Switch 2: libounce / OunceVK; LuaJIT interpreter\n");
+		Result socketRc = socketInitializeDefault();
+		printf("socketInitializeDefault: 0x%x (offline play does not require network)\n", socketRc);
+#else
 		socketInitializeDefault();
 		nxlinkStdio();
+#endif
 		appletSetGamePlayRecordingState(1);
 		getcwd(g_cwd, FS_MAX_PATH);
+#ifdef __SWITCH2__
+		printf("Data directory: %s\n", g_cwd);
+#endif
 
 		Result rc = romfsInit();
 		if(R_SUCCEEDED(rc))

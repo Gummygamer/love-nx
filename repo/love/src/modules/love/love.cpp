@@ -166,7 +166,12 @@ extern "C"
 	extern int luaopen_love_boot(lua_State*);
 }
 
+extern "C" int luaopen_ns2image(lua_State *);
+extern "C" int luaopen_ns2text(lua_State *);
+
 static const luaL_Reg modules[] = {
+	{ "ns2image", luaopen_ns2image },
+	{ "ns2text", luaopen_ns2text },
 #if defined(LOVE_ENABLE_AUDIO)
 	{ "love.audio", luaopen_love_audio },
 #endif

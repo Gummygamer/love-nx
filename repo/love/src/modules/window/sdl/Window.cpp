@@ -349,6 +349,9 @@ bool Window::createWindowAndContext(int x, int y, int w, int h, Uint32 windowfla
 			return false;
 		}
 
+#ifdef __SWITCH2__
+		printf("Switch 2 GL context: %s\n", glversion.c_str());
+#endif
 		return true;
 	};
 

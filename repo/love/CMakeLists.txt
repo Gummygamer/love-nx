@@ -1835,6 +1835,10 @@ endif()
 #
 add_executable(${LOVE_EXE_NAME} WIN32 src/love.cpp ${LOVE_RC})
 target_link_libraries(${LOVE_EXE_NAME} ${LOVE_LIB_NAME})
+if(NS2_OFFLINE_SOURCE)
+  include("${NS2_OFFLINE_SOURCE}/link-runtime.cmake")
+endif()
+
 set_target_properties(${LOVE_EXE_NAME} PROPERTIES C_VISIBILITY_PRESET hidden CXX_VISIBILITY_PRESET hidden VISIBILITY_INLINES_HIDDEN ON)
 
 if(MSVC OR MINGW)
